@@ -15,6 +15,8 @@ import {
   IPrebidBidderDoneEventData,
 } from '../../Injected/prebid';
 import { ITcfDetails } from '../../Injected/tcf';
+import { IIoidTrackingData, IIoidAuctionData, IIoidBidderData } from '../components/ioidTracking/IoidTrackingTypes';
+import { extractGlobalIoidFromBidderDone, extractBidRequestIoid } from '../components/ioidTracking/ioidUtils';
 
 declare global {
   interface Document {
@@ -46,6 +48,7 @@ const AppStateContext = React.createContext<AppState>({
   allpaapiBidEvents: [],
   allpaapiNoBidEvents: [],
   adsRendered: [],
+  ioidTrackingData: { auctions: [] },
   prebid: {} as IPrebidDetails,
   prebids: {} as IPrebids,
   initiatorOutput: {},
@@ -90,6 +93,7 @@ export const StateContextProvider = ({ children }: StateContextProviderProps) =>
   const [paapiRunAuctionEvents, setPaapiRunAuctionEvents] = useState<IPrebidPaapiAuctionEvent[]>([]);
   const [allpaapiBidEvents, setAllPaapiBidEvents] = useState<IPrebidPaapiBidEvent[]>([]);
   const [allpaapiNoBidEvents, setAllPaapiNoBidEvents] = useState<IPrebidPaapiBidEvent[]>([]);
+  const [ioidTrackingData, setIoidTrackingData] = useState<IIoidTrackingData>({ auctions: [] });
 
   useEffect(() => {
     setPbjsNamespaces(Object.keys(prebids).filter((key) => key !== 'tcf'));
@@ -171,6 +175,46 @@ export const StateContextProvider = ({ children }: StateContextProviderProps) =>
     const allWinningBids = events?.filter(({ eventType }) => eventType === 'bidWon') as IPrebidBidWonEventData[];
     const adsRendered = events?.filter(({ eventType }) => eventType === 'adRenderSucceeded') as IPrebidAdRenderSucceededEventData[];
 
+    // Process IOID tracking data
+    const processedIoidData = (() => {
+      if (!auctionEndEvents || auctionEndEvents.length === 0) {
+        return { auctions: [] };
+      }
+
+      const auctionData: IIoidAuctionData[] = auctionEndEvents.map((auctionEvent, index) => {
+        const auctionId = auctionEvent.args.auctionId;
+        
+        // Get bidderDone events for this auction
+        const auctionBidderDoneEvents = allBidderDoneEvents.filter(
+          (event) => event.args.auctionId === auctionId
+        );
+
+        // Extract IOID data for each bidder
+        const bidders: IIoidBidderData[] = auctionBidderDoneEvents.map((bidderEvent) => {
+          // Extract global IOID from this specific auction's bidderDone event
+          // This ensures we get the IOID that was active during this auction, not the current global value
+          const globalIoid = extractGlobalIoidFromBidderDone(bidderEvent);
+          const bidRequestIoid = extractBidRequestIoid(bidderEvent);
+
+          return {
+            bidderCode: bidderEvent.args.bidderCode,
+            globalIoid,
+            bidRequestIoid
+          };
+        });
+
+        return {
+          auctionCycle: index + 1,
+          auctionId,
+          adUnitCount: auctionEvent.args.adUnitCodes?.length || 0,
+          timestamp: auctionEvent.args.timestamp,
+          bidders
+        };
+      });
+
+      return { auctions: auctionData };
+    })();
+
     setPrebid(prebid);
     setEvents(events);
     setAuctionInitEvents(auctionInitEvents);
@@ -186,6 +230,7 @@ export const StateContextProvider = ({ children }: StateContextProviderProps) =>
     setAllAdUnitCodes(allAdUnitCodes);
     setAllWinningBids(allWinningBids);
     setAdsRendered(adsRendered);
+    setIoidTrackingData(processedIoidData);
   }, [pbjsNamespace, prebids]);
 
   const contextValue: AppState = {
@@ -213,6 +258,7 @@ export const StateContextProvider = ({ children }: StateContextProviderProps) =>
     allpaapiBidEvents,
     allpaapiNoBidEvents,
     adsRendered,
+    ioidTrackingData,
     initiatorOutput,
     setInitiatorOutput,
     isRefresh,
@@ -257,6 +303,7 @@ interface AppState {
   allpaapiNoBidEvents: IPrebidPaapiBidEvent[];
 
   adsRendered: IPrebidAdRenderSucceededEventData[];
+  ioidTrackingData: IIoidTrackingData;
   initiatorOutput: {
     [key: string]: any;
   };

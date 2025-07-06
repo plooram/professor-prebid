@@ -8,7 +8,7 @@ class Background {
   tabInfos: ITabInfos = {};
   timeoutId: NodeJS.Timeout | null = null;
   lastWriteToStorage: number | null = null;
-  writeTimeoutId: number | null = null;
+  writeTimeoutId: NodeJS.Timeout | null = null;
 
   constructor() {
     chrome.runtime.onMessage.addListener(this.handleMessagesFromInjected);
@@ -122,7 +122,7 @@ class Background {
       clearTimeout(this.writeTimeoutId);
     }
 
-    this.writeTimeoutId = window.setTimeout(() => {
+    this.writeTimeoutId = setTimeout(() => {
       this.persistInStorage();
       this.lastWriteToStorage = now;
       this.writeTimeoutId = null;

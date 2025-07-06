@@ -1,7 +1,7 @@
 {
-  "name": "professor-prebid",
-  "version": "0.0.1",
-  "description": "Prebid's next-gen debugging tool",
+  "name": "exchain-bid-analysis",
+  "version": "1.0.0",
+  "description": "Exchain's bid analysis and debugging tool",
   "license": "ISC",
   "repository": {
     "type": "git",

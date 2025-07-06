@@ -10,6 +10,14 @@ delete config.chromeExtensionBoilerplate;
 
 config.mode = 'production';
 
-webpack(config, function (err) {
-  if (err) throw err;
+webpack(config, function (err, stats) {
+  if (err) {
+    console.error('Build failed:', err);
+    throw err;
+  }
+  if (stats.hasErrors()) {
+    console.error('Build errors:', stats.toString());
+  } else {
+    console.log('Build completed successfully');
+  }
 });

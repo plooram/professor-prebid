@@ -11,6 +11,7 @@ import { Routes, Route } from 'react-router-dom';
 import InitiatorComponent from './initiator/InitiatorComponent';
 import PbjsVersionInfoComponent from './pbjsVersionInfo/PbjsVersionInfoComponent';
 import PaapiComponent from './paapi/PaapiComponent';
+import IoidTrackingComponent from './ioidTracking/IoidTrackingComponent';
 
 const RoutesComponent = (): JSX.Element => {
   return (
@@ -22,6 +23,7 @@ const RoutesComponent = (): JSX.Element => {
       <Route path="timeline" element={<TimelineComponent />}></Route>
       <Route path="config" element={<ConfigComponent />} />
       <Route path="userId" element={<UserIdsComponent />} />
+      <Route path="ioid-tracking" element={<IoidTrackingComponent />} />
       <Route path="tools" element={<ToolsComponent />} />
       <Route path="events" element={<EventsComponent />} />
       <Route path="events" element={<EventsComponent />} />

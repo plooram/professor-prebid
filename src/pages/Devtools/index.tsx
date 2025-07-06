@@ -1,1 +1,1 @@
-chrome.devtools?.panels?.create('Professor Prebid', 'icon-34.png', 'panel.html', async (panel) => {});
+chrome.devtools?.panels?.create('Exchain Bid Analysis', 'icon-34.png', 'panel.html', async (panel) => {});

@@ -26,6 +26,11 @@ export const getTabId = (): Promise<number> => {
 };
 
 export const sendWindowPostMessage = (type: string, payload: object): void => {
+  // Guard against service worker context where document/window are not available
+  if (typeof document === 'undefined' || typeof window === 'undefined') {
+    return;
+  }
+  
   // work-around for
   // DOMException:xyz could not be cloned.
   // in window.postMessage
@@ -84,11 +89,30 @@ export const reloadPage = async () => {
 };
 
 export const sendChromeTabsMessage = async (type: string, payload: object | string): Promise<void> => {
-  const tabId = await getTabId();
-  chrome.tabs.sendMessage(tabId, { type, payload });
+  try {
+    const tabId = await getTabId();
+    if (!tabId) {
+      console.warn('Exchain Bid Analysis: No tab ID available for message sending');
+      return;
+    }
+    
+    chrome.tabs.sendMessage(tabId, { type, payload }, (response) => {
+      if (chrome.runtime.lastError) {
+        // Silently handle connection errors - this is normal behavior
+        // when content script hasn't loaded yet or page is being navigated
+        console.debug('Exchain Bid Analysis: Message sending failed (this is normal):', chrome.runtime.lastError.message);
+      }
+    });
+  } catch (error) {
+    console.debug('Exchain Bid Analysis: Message sending error:', error);
+  }
 };
 
 export const detectIframe = (): boolean => {
+  // Guard against service worker context where window is not available
+  if (typeof window === 'undefined') {
+    return false;
+  }
   try {
     return window.self !== window.top;
   } catch (e) {

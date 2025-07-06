@@ -19,8 +19,8 @@ export const InspectedPageContextProvider = ({ children }: ChromeStorageProvider
 
   useEffect(() => {
     // Read initial value from chrome.storage.local
-    chrome.storage.local.get(['tabInfos'], async ({ tabInfos, url }) => {
-      if (tabInfos && url) {
+    chrome.storage.local.get(['tabInfos'], async ({ tabInfos }) => {
+      if (tabInfos) {
         const tabInfoWithEvents = await fetchEvents(tabInfos, setDownloading, setSyncInfo, []);
         setFrames(tabInfoWithEvents);
       }
@@ -32,9 +32,18 @@ export const InspectedPageContextProvider = ({ children }: ChromeStorageProvider
     const handler = async (changes: any, areaName: 'sync' | 'local' | 'managed') => {
       if (areaName === 'local' && changes?.tabInfos) {
         const tabId = await getTabId();
-        if (JSON.stringify(changes.tabInfos.newValue[tabId]) !== JSON.stringify(changes.tabInfos.oldValue[tabId])) {
+        
+        // Add null checks to prevent undefined access errors
+        if (!changes.tabInfos.newValue || !tabId) {
+          return;
+        }
+        
+        const newValue = changes.tabInfos.newValue[tabId];
+        const oldValue = changes.tabInfos.oldValue?.[tabId];
+        
+        if (JSON.stringify(newValue) !== JSON.stringify(oldValue)) {
           const tabInfoWithEvents = await fetchEvents(
-            { ...changes.tabInfos.newValue, [tabId]: changes.tabInfos.newValue[tabId] },
+            { ...changes.tabInfos.newValue, [tabId]: newValue },
             setDownloading,
             setSyncInfo,
             downloadingUrls

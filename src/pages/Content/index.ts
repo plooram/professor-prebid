@@ -7,7 +7,7 @@ let pbjsNamespace: string = null;
 const injectScript = () => {
   const script = document.createElement('script');
   script.src = chrome.runtime.getURL('/injected.bundle.js');
-  script.id = 'professor prebid injected bundle';
+  script.id = 'exchain bid analysis injected bundle';
   const node = document.head || document.documentElement;
   if (node && !['challenges.cloudflare.com'].includes(window.location.host)) {
     node.appendChild(script);
@@ -71,12 +71,12 @@ const updateOverlays = () => {
   }
 };
 
-const setUpListeners = () => {
-  listenToWindowMessages();
-  listenToChromeRuntimeMessages();
-};
 injectScript();
 
+// Always set up Chrome runtime message listeners
+listenToChromeRuntimeMessages();
+
+// Only set up window message listeners for non-iframe pages
 if (detectIframe() === false) {
-  setUpListeners();
+  listenToWindowMessages();
 }

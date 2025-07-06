@@ -860,3 +860,38 @@ interface IUuids {
     [key: string]: string;
   };
 }
+
+// Enhanced ortb2 interfaces for IOID tracking
+export interface IOrtb2SiteExt {
+  data?: {
+    ioids?: string;
+    [key: string]: any;
+  };
+  [key: string]: any;
+}
+
+export interface IOrtb2SiteForIoid {
+  id?: string;
+  name?: string;
+  domain?: string;
+  keywords?: string;  // Contains IOID in comma-separated keywords
+  ext?: IOrtb2SiteExt;
+  [key: string]: any;
+}
+
+export interface IOrtb2ForIoid {
+  site?: IOrtb2SiteForIoid;
+  [key: string]: any;
+}
+
+// Enhanced config interface to include ortb2
+export interface IPrebidConfigWithOrtb2 extends IPrebidConfig {
+  ortb2?: IOrtb2ForIoid;
+}
+
+// Enhanced bidder done event interface with proper ortb2 typing
+export interface IPrebidBidderDoneEventDataWithOrtb2 extends IPrebidBidderDoneEventData {
+  args: IPrebidBidderDoneEventData['args'] & {
+    ortb2?: IOrtb2ForIoid;
+  };
+}

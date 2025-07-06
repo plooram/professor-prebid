@@ -34,7 +34,18 @@ export const fetchEvents = async (
   downloadingUrls: string[]
 ) => {
   const tabId = await getTabId();
+  
+  // Add null checks to prevent undefined access errors
+  if (!tabInfos || !tabId) {
+    return {};
+  }
+  
   const tabInfo = tabInfos[tabId];
+  
+  // Return empty object if tabInfo doesn't exist
+  if (!tabInfo) {
+    return {};
+  }
 
   for (const frameId of Object.keys(tabInfo)) {
     const { prebids } = tabInfo[frameId];

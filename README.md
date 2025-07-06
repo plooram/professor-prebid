@@ -1,4 +1,4 @@
-# Professor Prebid Chrome Extension
+# Exchain Bid Analysis Chrome Extension
 
 ## Installing & Running
 

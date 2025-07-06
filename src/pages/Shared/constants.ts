@@ -8,6 +8,7 @@ import WarningAmberOutlinedIcon from '@mui/icons-material/WarningAmberOutlined';
 import DifferenceIcon from '@mui/icons-material/Difference';
 import LinkIcon from '@mui/icons-material/Link';
 import PrivacyTipOutlinedIcon from '@mui/icons-material/PrivacyTipOutlined';
+import TrackChangesIcon from '@mui/icons-material/TrackChanges';
 import { OverridableComponent } from '@mui/material/OverridableComponent';
 import { SvgIconTypeMap } from '@mui/material';
 
@@ -90,6 +91,7 @@ export const PAGES: {
     { label: 'Timeline', path: 'timeline', Icon: TimelineOutlinedIcon, beta: false },
     { label: 'Config', path: 'config', Icon: SettingsOutlinedIcon, beta: false },
     { label: 'User Id', path: 'userId', Icon: ContactPageOutlinedIcon, beta: false },
+    { label: 'IOID Tracking', path: 'ioid-tracking', Icon: TrackChangesIcon, beta: false },
     { label: 'Tools', path: 'tools', Icon: DnsOutlinedIcon, beta: false },
     { label: 'Events', path: 'events', Icon: WarningAmberOutlinedIcon, beta: false },
     { label: 'Version', path: 'version', Icon: DifferenceIcon, beta: false },
